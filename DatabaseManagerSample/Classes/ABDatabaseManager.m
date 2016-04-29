@@ -131,22 +131,22 @@ static ABDatabaseManager * sharedInstance = nil;
     }
 }
 
-- (void)saveChildContexts:(NSArray *)childManagedObjectContentexts databaseUpdatedCompletionHandler:(ABDatabaseUpdateSuccessfulCompletionHandler)completionHandler {
+- (void)saveChildContexts:(NSArray *)childManagedObjectContexts databaseUpdatedCompletionHandler:(ABDatabaseUpdateSuccessfulCompletionHandler)completionHandler {
     static ABDatabaseUpdateSuccessfulCompletionHandler dbOperationsCompletionHandler = nil;
     if (completionHandler) {
         dbOperationsCompletionHandler = completionHandler;
     }
-    if (childManagedObjectContentexts.count == 0) {
+    if (childManagedObjectContexts.count == 0) {
         [self saveMainContextWithCompletionHandler:dbOperationsCompletionHandler];
         return;
     }
-    NSManagedObjectContext *childContext = [childManagedObjectContentexts lastObject];
+    NSManagedObjectContext *childContext = [childManagedObjectContexts lastObject];
     [childContext performBlock:^{
         NSError *error;
         if ([childContext hasChanges] && ![childContext save:&error]) {
             NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         }
-        NSArray *subArray = [childManagedObjectContentexts subarrayWithRange:NSMakeRange(0, childManagedObjectContentexts.count - 1)];
+        NSArray *subArray = [childManagedObjectContexts subarrayWithRange:NSMakeRange(0, childManagedObjectContexts.count - 1)];
         [self saveChildContexts:subArray databaseUpdatedCompletionHandler:nil];
     }];
 }
